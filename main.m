@@ -27,7 +27,7 @@ end
 m = digit(1);
 p = digit(2);
 t = digit(3) * 10 + digit(4);
-c = 1;
+c = 1; % Unit value
 
 % Airfoil function
 [x_b,y_b] = NACA_Airfoils(m,p,t,c,N);
