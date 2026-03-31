@@ -15,11 +15,11 @@ close all
 %% Read in NACA files
 
 % Defining NACA airfoil as a character
-NACA = '0021';
+NACA = '2412';
 
 % Turning Matrix into an array of each digit
 for i = 1:4
-    digit(i) = str2num(digit_array(i));
+    digit(i) = str2num(NACA(i));
 end
 
 % Defining the airfoil parameters
