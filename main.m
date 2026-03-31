@@ -24,11 +24,18 @@ for i = 1:4
 end
 
 % Defining the airfoil parameters
-m = digit(1);
-p = digit(2);
-t = digit(3) * 10 + digit(4);
+m = digit(1) / 100;
+p = digit(2) / 100;
+t = (digit(3) * 10 + digit(4)) / 100;
 c = 1; % Unit value
+N = 100;
 
 % Airfoil function
 [x_b,y_b] = NACA_Airfoils(m,p,t,c,N);
+
+figure()
+plot(x_b,y_b)
+hold on;
+xlim([0 c])
+ylim([-0.1 0.15])
 
