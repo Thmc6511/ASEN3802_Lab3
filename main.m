@@ -1,6 +1,16 @@
+%% ASEN 3111 - Computational Assignment XX - Main
+% Provide a breif summary of the problem statement and code so that
+% you or someone else can later understand what you attempted to do
+% it doesn’t have to be that long.
+%
+% Author: {primary author, should be you}
+% Collaborators: J. Doe, J. Smith {acknowledge whomever you worked with}
+% Date: {should include the date last revised}
+% Then start your code, i.e.
+
 clc;
 clear;
-close all;
+close all
 
 %% Read in NACA files
 
