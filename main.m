@@ -14,9 +14,8 @@ close all
 
 %% Read in NACA files
 
-% Defining NACA airfoil and turning it into a character
-NACA = 2412;
-digit_array = num2str(NACA);
+% Defining NACA airfoil as a character
+NACA = '0021';
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -37,5 +36,5 @@ figure()
 plot(x_b,y_b)
 hold on;
 xlim([0 c])
-ylim([-0.1 0.15])
+ylim([-c c])
 
