@@ -40,15 +40,20 @@ N = 50;
 
 %% Task 2
 
+% Defining Alpha
 ALPHA = 12;
 
+% Using a very large number of N to calculate for Cl_exact
 [x_exact,y_exact] = NACA_Airfoils(m,p,t,c,1000);
 [CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
 
-fprintf('Exact CD value: %f3',CL_exact)
+% Printing our Exact Cl value to Command Window
+fprintf('Exact Cl value: %f.3',CL_exact)
 
+% Function to calculate N vs Cl
 [N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m,p,t,c);
 
+% Plotting for Task 2
 figure()
 plot(2 * N_array,CL)
 hold on;
