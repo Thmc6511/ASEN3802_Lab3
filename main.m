@@ -15,7 +15,7 @@ close all
 %% Read in NACA files
 
 % Defining NACA airfoil as a character
-NACA = '0021';
+NACA = '0012';
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -53,9 +53,9 @@ figure()
 plot(2 * N_array,CL)
 hold on;
 yline(CL_exact, 'k')
-
 yline(CL_exact + 0.01 * CL_exact,'r--')
 yline(CL_exact - 0.01 * CL_exact,'r--')
+xlim([0,400])
 grid on;
 title('Number of Panels vs Coefficient of Lift for NACA 0012')
 xlabel('Number of Panels (N)')
