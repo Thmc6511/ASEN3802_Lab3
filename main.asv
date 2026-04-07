@@ -52,10 +52,13 @@ fprintf('Exact CD value: %f3',CL_exact)
 figure()
 plot(2 * N_array,CL)
 hold on;
+yline(CL_exact, 'k')
 yline(CL_exact + 0.01 * CL_exact,'r--')
 yline(CL_exact - 0.01 * CL_exact,'r--')
-yline(CL_exact, 'k')
 grid on;
-xlabel('')
+title('Number of Panels vs Coefficient of Lift')
+xlabel('Number of Panels (N)')
+ylabel('Coefficient of Lift (C_L)')
+legend('Calculated C_L','C_L Exact','1% Bounds')
 
 

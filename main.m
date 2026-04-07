@@ -15,7 +15,7 @@ close all
 %% Read in NACA files
 
 % Defining NACA airfoil as a character
-NACA = '0012';
+NACA = '0021';
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -42,7 +42,7 @@ N = 50;
 
 ALPHA = 12;
 
-[x_exact,y_exact] = NACA_Airfoils(m,p,t,c,800);
+[x_exact,y_exact] = NACA_Airfoils(m,p,t,c,1000);
 [CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
 
 fprintf('Exact CD value: %f3',CL_exact)
@@ -52,10 +52,14 @@ fprintf('Exact CD value: %f3',CL_exact)
 figure()
 plot(2 * N_array,CL)
 hold on;
+yline(CL_exact, 'k')
+
 yline(CL_exact + 0.01 * CL_exact,'r--')
 yline(CL_exact - 0.01 * CL_exact,'r--')
-yline(CL_exact, 'k')
 grid on;
-xlabel('')
+title('Number of Panels vs Coefficient of Lift for NACA 0012')
+xlabel('Number of Panels (N)')
+ylabel('Coefficient of Lift (C_L)')
+legend('Calculated C_L','C_L Exact','1% Error Bounds')
 
 
