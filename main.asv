@@ -15,7 +15,7 @@ close all
 %% Read in NACA files
 
 % Defining NACA airfoil as a character
-NACA = '0012';
+NACA = '2412';
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -40,14 +40,7 @@ ylim([-c c])
 
 ALPHA = 12;
 
-N_array = linspace(2,201,200);
 
-for i = 1:length(N_array)
-    [x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N_array(i));
-    [CL(i)] = Vortex_Panel(x_b1,y_b1,ALPHA);
-end
+[x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N_array);
+[CL] = Vortex_Panel(x_b1,y_b1,ALPHA);
 
-figure()
-hold on;
-grid on;
-plot(N_array,CL)
