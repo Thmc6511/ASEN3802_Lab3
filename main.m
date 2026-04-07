@@ -24,30 +24,38 @@ end
 
 % Defining the airfoil parameters
 m = digit(1) / 100;
-p = digit(2) / 100;
+p = digit(2) / 10;
 t = (digit(3) * 10 + digit(4)) / 100;
 c = 1; % Unit value
-N = 100;
+N = 50;
 
 % Airfoil function
 [x_b,y_b] = NACA_Airfoils(m,p,t,c,N);
 
-figure()
-plot(x_b,y_b)
-hold on;
-xlim([0 c])
-ylim([-c c])
+% figure()
+% plot(x_b,y_b)
+% hold on;
+% xlim([0 c])
+% ylim([-c c])
+
+%% Task 2
 
 ALPHA = 12;
 
-N_array = linspace(2,201,200);
+[x_exact,y_exact] = NACA_Airfoils(m,p,t,c,800);
+[CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
 
-for i = 1:length(N_array)
-    [x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N_array(i));
-    [CL(i)] = Vortex_Panel(x_b1,y_b1,ALPHA);
-end
+fprintf('Exact CD value: %f3',CL_exact)
+
+[N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m,p,t,c);
 
 figure()
+plot(2 * N_array,CL)
 hold on;
+yline(CL_exact + 0.01 * CL_exact,'r--')
+yline(CL_exact - 0.01 * CL_exact,'r--')
+yline(CL_exact, 'k')
 grid on;
-plot(N_array,CL)
+xlabel('')
+
+

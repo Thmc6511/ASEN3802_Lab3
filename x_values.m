@@ -13,6 +13,6 @@ theta = linspace(0,360, number_of_values);
 
 r = chord_length/2;
 
-x_values = r + r* cosd(theta);
+x_values = r + r * cosd(theta);
 end
 
