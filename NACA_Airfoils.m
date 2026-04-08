@@ -1,4 +1,4 @@
-function [x_b,y_b] = NACA_Airfoils(m,p,t,c,N)
+function [x_b,y_b,x_camber,y_camber] = NACA_Airfoils(m,p,t,c,N)
 %NewFunction Summary of this function goes here
 % Detailed explanation goes here
 %
@@ -23,6 +23,9 @@ if m ~= 0 && p ~= 0
         end
     end
 end
+
+x_camber = x;
+y_camber = y_c;
 
 zeta = atan(dy_dx);
 

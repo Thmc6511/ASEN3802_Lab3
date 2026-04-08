@@ -68,10 +68,10 @@ h4 = plot(x_b2, y_b2, '-', 'Color', 'r', 'LineWidth', 1.8, 'DisplayName', 'NACA 
  
 % Panel boundary points
 h5 = plot(x_b2, y_b2, 's', 'Color', 'r', 'MarkerFaceColor', 'r', 'MarkerSize', 4.5, 'DisplayName', 'NACA 2421 Panel Points');
- 
+
 % Camber line
 h6 = plot(x_camber, y_camber, '--', 'Color', [0.7, 0.3, 0.9], 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Camber Line');
- 
+
 % Chord line reference
 h7 = plot([0, c], [0, 0], '--', 'Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
  
