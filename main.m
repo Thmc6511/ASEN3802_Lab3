@@ -14,7 +14,7 @@ close all
 
 %% Read in NACA files
 
-% Defining NACA airfoil as a character
+% Defining NACA airfoil for 0021
 NACA_1 = '0021';
 
 % Turning Matrix into an array of each digit
@@ -32,7 +32,7 @@ N = 50;
 % Airfoil function
 [x_b1,y_b1,~,~] = NACA_Airfoils(m_1,p_1,t_1,c,N);
 
-% Defining NACA airfoil as a character
+% Defining NACA airfoil for 2421
 NACA_2 = '2421';
 
 % Turning Matrix into an array of each digit
@@ -61,6 +61,7 @@ h3 = plot([0, c], [0, 0], '--','Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'C
 hold off;
 grid on;
 axis equal;
+% Labels, titles, and tidying
 xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
 ylabel('y/c', 'FontSize', 14, 'FontWeight', 'bold');
 title('NACA 0021 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
@@ -87,21 +88,20 @@ h7 = plot([0, c], [0, 0], '--', 'Color', 'k', 'LineWidth', 1.2, 'DisplayName', '
 hold off;
 grid on;
 axis equal;
- 
+% Labels, titles, and tidying
 xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
 ylabel('y/c ', 'FontSize', 14, 'FontWeight', 'bold');
 title('NACA 2421 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
-
 x_margin = 0.05 * c;
 y_margin = 0.15 * c;
 xlim([-x_margin, c + x_margin]);
 ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
- 
 legend([h4, h5, h6, h7], ...
     'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
 
 %% Task 2
 
+% Defining the '0012' Airfoil for Task 2 calculations
 NACA_3 = '0012';
 
 % Turning Matrix into an array of each digit
@@ -122,7 +122,7 @@ ALPHA = 12;
 [CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
 
 % Printing our Exact Cl value to Command Window
-fprintf('Exact Cl value: %f',CL_exact)
+fprintf('Exact Cl value: %f \n',CL_exact)
 
 % Function to calculate N vs Cl
 [N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m_3,p_3,t_3,c);
@@ -140,6 +140,13 @@ title('Number of Panels vs Coefficient of Lift for NACA 0012')
 xlabel('Number of Panels (N)')
 ylabel('Coefficient of Lift (C_L)')
 legend('Calculated C_L','C_L Exact','1% Error Bounds')
+
+%% Task 3
+
+
+
+
+%% Task 4
 
 %% Functions
 
