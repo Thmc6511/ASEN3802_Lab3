@@ -146,6 +146,72 @@ legend('Calculated C_L','C_L Exact','1% Error Bounds')
 
 %% Task 3
 
+% Experimental data read in
+Exp_NACA_0006 = readmatrix("NACA 0006.csv");
+Exp_NACA_0006_x = Exp_NACA_0006(:,1);
+Exp_NACA_0006_y = Exp_NACA_0006(:,2);
+Exp_NACA_0012 = readmatrix("NACA 0012.csv");
+Exp_NACA_0012_x = Exp_NACA_0012(:,1);
+Exp_NACA_0012_y = Exp_NACA_0012(:,2);
+
+% Thin Airfoil
+alpha_ThinAir = -10:0.5:10;
+CL_ThinAir = (alpha_ThinAir*pi/180)*(2*pi);
+
+% NACA 0006
+alpha_0006 = -10:0.5:10;
+[x_0006,y_0006] = NACA_Airfoils(0,0,0.06,1,69);
+for i=1:length(alpha_0006)
+    CL_0006(i) = Vortex_Panel(x_0006, y_0006, alpha_0006(i));
+end
+
+% NACA 0012
+alpha_0012 = -10:0.5:10;
+[x_0012,y_0012] = NACA_Airfoils(0,0,0.12,1,69);
+for i=1:length(alpha_0012)
+    CL_0012(i) = Vortex_Panel(x_0012, y_0012, alpha_0012(i));
+end
+
+% NACA 0018
+
+alpha_0018 = -10:0.5:10;
+[x_0018,y_0018] = NACA_Airfoils(0,0,0.18,1,69);
+for i=1:length(alpha_0018)
+    CL_0018(i) = Vortex_Panel(x_0018, y_0018, alpha_0018(i));
+end
+
+figure()
+plot(alpha_0006, CL_0006, LineWidth=1)
+hold on
+plot(alpha_0012, CL_0012, LineWidth=1)
+plot(alpha_0018, CL_0018, LineWidth=1)
+plot(Exp_NACA_0006_x, Exp_NACA_0006_y, LineWidth=1)
+plot(Exp_NACA_0012_x, Exp_NACA_0012_y, LineWidth=1)
+plot(alpha_ThinAir,CL_ThinAir, LineWidth=1)
+xlim([-10,10])
+title('\alpha vs c_L (Predicted, Experimental, & TAT)')
+xlabel('\alpha')
+ylabel('c_l')
+legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.', 'NACA 0012 Exp.', 'Thin Airfoil Plot', Location='northwest')
+
+% Find slope
+p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
+lift_slope_0006_pred = p_0006_pred(1)
+
+p_0012_pred = polyfit(alpha_0012, CL_0012, 1);
+lift_slope_0012_pred = p_0012_pred(1)
+
+p_0018_pred = polyfit(alpha_0018, CL_0018, 1);
+lift_slope_0018_pred = p_0018_pred(1)
+
+p_0006_pred = polyfit(Exp_NACA_0006_x, Exp_NACA_0006_y, 1);
+lift_slope_0006_pred = p_0006_pred(1)
+
+p_0012_pred = polyfit(Exp_NACA_0012_x, Exp_NACA_0012_y, 1);
+lift_slope_0012_pred = p_0012_pred(1)
+
+p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
+lift_TAT = p_TAT(1)
 
 
 
