@@ -141,6 +141,108 @@ xlabel('Number of Panels (N)')
 ylabel('Coefficient of Lift (C_L)')
 legend('Calculated C_L','C_L Exact','1% Error Bounds')
 
+%Task 4
+
+% NACA numbers 
+NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
+
+%angle of attack values
+ALPHAS = linspace(-10,18,29);
+
+%experimental data from NACA charts 
+NACA0012Cl = [-1.1 -.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1.1 1.3 1.35 1.4 1.5 1.6 1.3 1];
+NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.45];
+NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
+%angle of attack values corresponding to NACA chart Cl values
+NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
+
+%storing lift slope of experimental data
+EXP_NACAS = {NACA0012Cl NACA2412Cl NACA4412Cl};
+for i = 1:3
+    exp_coeffs = polyfit(NACAchartalphas(1:11), EXP_NACAS{i}(1:11), 1);
+    exp_slope(i) = exp_coeffs(1);
+    expalphaL0(i) = interp1(EXP_NACAS{i}(1:11), NACAchartalphas(1:11), 0);
+end
+
+%vortex panel calculations
+% Turning Matrix into an array of each digit
+for i = 1:3
+
+    digit2 = NACAS(i,:);
+    
+% Defining the airfoil parameters
+m = digit2(1) / 100;
+p = digit2(2) / 10;
+t = (digit2(3) * 10 + digit2(4)) / 100;
+c = 1; % Unit value
+N2 = 34;
+[x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N2);
+
+CL2 = zeros(1, length(ALPHAS));
+for k = 1:length(ALPHAS)
+    [CL2(k)] = Vortex_Panel(x_b1,y_b1,ALPHAS(k));
+ 
+end
+% Fit a line to get slope and zero-lift alpha
+VPcoeffs = polyfit(ALPHAS, CL2, 1);
+lift_slope(i) = VPcoeffs(1);          % per degree
+alpha_L0(i) = -VPcoeffs(2)/VPcoeffs(1); % zero-lift alpha in degrees
+
+figure(3)
+hold on;
+plot(ALPHAS,CL2)
+end
+
+
+%thin airfoil theory
+a0_TAT_deg = 2*pi * pi/180;  % 2π/rad converted to degree units
+
+TATalphaL0 = zeros(1,3);
+for i = 1:3
+    TATdigit = NACAS(i,:);
+    %max camber
+    m = TATdigit(1) / 100;
+    %location of max camber 
+    p = TATdigit(2) / 10;
+    if m == 0
+        TATalphaL0(i) = 0;
+    else
+        pts = 1000;   %number of integration points
+        theta0 = linspace(0, pi, pts);
+
+        xc = 0.5*(1 - cos(theta0)); %position at each theta value
+        dycdx = zeros(1, pts);
+        for j = 1:pts
+            if xc(j) < p
+                %camber slope before max camber
+                dycdx(j) = (2*m/p^2)*(p - xc(j));
+            else
+                %camber slope after max camber 
+                dycdx(j) = (2*m/(1-p)^2)*(p - xc(j));
+            end
+        end
+        integrand = dycdx .* (cos(theta0) - 1);
+        %calculating zero lift angle of attack
+        TATalphaL0(i) = -(1/pi) * trapz(theta0, integrand) * 180/pi;
+    end
+    %calculating lift slope 
+    CL_TAT = a0_TAT_deg * (ALPHAS - TATalphaL0(i));
+    TAT_lift_slope(i) = a0_TAT_deg;
+    plot(ALPHAS, CL_TAT, '--', 'LineWidth', 1.2)
+end
+%plotting experimental data 
+plot(NACAchartalphas, NACA0012Cl, 'o', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA2412Cl, 's', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA4412Cl, '^', 'MarkerSize', 5)
+grid on;
+
+%plot labels and legend
+xlabel('\alpha (degrees)')
+ylabel('C_l')
+title('Effect of Camber on Lift')
+legend('NACA 0012', 'NACA 2412', 'NACA 4412','NACA 0012 TAT','NACA 2412 TAT', ...
+    'NACA 4412 TAT','NACA 0012 Exp', 'NACA 2412 Exp', 'NACA 4412 Exp')
+
 %% Functions
 
 function [x_b,y_b,x_camber,y_camber] = NACA_Airfoils(m,p,t,c,N)
