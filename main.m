@@ -200,24 +200,24 @@ legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.'
 
 % Find slope for all
 p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
-lift_slope_0006_pred = p_0006_pred(1)
+lift_slope_0006_pred = p_0006_pred(1);
 
 p_0012_pred = polyfit(alpha_0012, CL_0012, 1);
-lift_slope_0012_pred = p_0012_pred(1)
+lift_slope_0012_pred = p_0012_pred(1);
 
 p_0018_pred = polyfit(alpha_0018, CL_0018, 1);
-lift_slope_0018_pred = p_0018_pred(1)
+lift_slope_0018_pred = p_0018_pred(1);
 
 p_0006_pred = polyfit(Exp_NACA_0006_x, Exp_NACA_0006_y, 1);
-lift_slope_0006_pred = p_0006_pred(1)
+lift_slope_0006_pred = p_0006_pred(1);
 
 p_0012_pred = polyfit(Exp_NACA_0012_x, Exp_NACA_0012_y, 1);
-lift_slope_0012_pred = p_0012_pred(1)
+lift_slope_0012_pred = p_0012_pred(1);
 
 p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
-lift_TAT = p_TAT(1)
+lift_TAT = p_TAT(1);
 
-%Task 4
+%% Task 4
 
 % NACA numbers 
 NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
