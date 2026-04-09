@@ -164,12 +164,16 @@ for i = 1:3
     expalphaL0(i) = interp1(EXP_NACAS{i}(1:11), NACAchartalphas(1:11), 0);
 end
 
+
+
 %vortex panel calculations
 % Turning Matrix into an array of each digit
 for i = 1:3
-
+    
+        
     digit2 = NACAS(i,:);
     
+
 % Defining the airfoil parameters
 m = digit2(1) / 100;
 p = digit2(2) / 10;
@@ -185,8 +189,8 @@ for k = 1:length(ALPHAS)
 end
 % Fit a line to get slope and zero-lift alpha
 VPcoeffs = polyfit(ALPHAS, CL2, 1);
-lift_slope(i) = VPcoeffs(1);          % per degree
-alpha_L0(i) = -VPcoeffs(2)/VPcoeffs(1); % zero-lift alpha in degrees
+VPlift_slope(i) = VPcoeffs(1);          % per degree
+VPalpha_L0(i) = -VPcoeffs(2)/VPcoeffs(1); % zero-lift alpha in degrees
 
 figure(3)
 hold on;
@@ -230,6 +234,9 @@ for i = 1:3
     TAT_lift_slope(i) = a0_TAT_deg;
     plot(ALPHAS, CL_TAT, '--', 'LineWidth', 1.2)
 end
+
+liftslopes = [VPlift_slope; TAT_lift_slope; exp_slope];
+allalphaL0 = [VPalpha_L0; TATalphaL0; expalphaL0];
 %plotting experimental data 
 plot(NACAchartalphas, NACA0012Cl, 'o', 'MarkerSize', 5)
 plot(NACAchartalphas, NACA2412Cl, 's', 'MarkerSize', 5)
@@ -242,6 +249,7 @@ ylabel('C_l')
 title('Effect of Camber on Lift')
 legend('NACA 0012', 'NACA 2412', 'NACA 4412','NACA 0012 TAT','NACA 2412 TAT', ...
     'NACA 4412 TAT','NACA 0012 Exp', 'NACA 2412 Exp', 'NACA 4412 Exp')
+
 
 %% Functions
 
