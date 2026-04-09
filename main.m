@@ -154,25 +154,28 @@ Exp_NACA_0012 = readmatrix("NACA 0012.csv");
 Exp_NACA_0012_x = Exp_NACA_0012(:,1);
 Exp_NACA_0012_y = Exp_NACA_0012(:,2);
 
-% Thin Airfoil
+% Thin Airfoil cl vs alpha
+
 alpha_ThinAir = -10:0.5:10;
 CL_ThinAir = (alpha_ThinAir*pi/180)*(2*pi);
 
-% NACA 0006
+% NACA 0006 cl vs alpha
+
 alpha_0006 = -10:0.5:10;
 [x_0006,y_0006] = NACA_Airfoils(0,0,0.06,1,69);
 for i=1:length(alpha_0006)
     CL_0006(i) = Vortex_Panel(x_0006, y_0006, alpha_0006(i));
 end
 
-% NACA 0012
+% NACA 0012 cl vs alpha
+
 alpha_0012 = -10:0.5:10;
 [x_0012,y_0012] = NACA_Airfoils(0,0,0.12,1,69);
 for i=1:length(alpha_0012)
     CL_0012(i) = Vortex_Panel(x_0012, y_0012, alpha_0012(i));
 end
 
-% NACA 0018
+% NACA 0018 cl vs alpha
 
 alpha_0018 = -10:0.5:10;
 [x_0018,y_0018] = NACA_Airfoils(0,0,0.18,1,69);
@@ -180,6 +183,7 @@ for i=1:length(alpha_0018)
     CL_0018(i) = Vortex_Panel(x_0018, y_0018, alpha_0018(i));
 end
 
+% Plotting all onto one plot
 figure()
 plot(alpha_0006, CL_0006, LineWidth=1)
 hold on
@@ -194,7 +198,7 @@ xlabel('\alpha')
 ylabel('c_l')
 legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.', 'NACA 0012 Exp.', 'Thin Airfoil Plot', Location='northwest')
 
-% Find slope
+% Find slope for all
 p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
 lift_slope_0006_pred = p_0006_pred(1)
 
@@ -212,8 +216,6 @@ lift_slope_0012_pred = p_0012_pred(1)
 
 p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
 lift_TAT = p_TAT(1)
-
-
 
 %% Task 4
 
