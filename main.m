@@ -1,12 +1,15 @@
-%% ASEN 3802 - Lab 3 - Main Code
-% Provide a breif summary of the problem statement and code so that
-% you or someone else can later understand what you attempted to do
-% it doesn’t have to be that long.
+%% ASEN 3802 - Lab 3: Part 1 - Main Code
+% This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
+% reads in airfoil traits and returns x and y values of an airfoils shape.
+% Task 2 find CL and compares error of this calculated value to an "exact
+% value. Task 3 calculates and takes in AoA vs CL from experimental data
+% and using thin airfoil theory. Task 4 calculates the AoA vs CL using the
+% methods created in Task 1 and Task 2, then plots these results against
+% task 3.
 %
-% Author: {Sam Wieder}
-% Collaborators: J. Doe, J. Smith {acknowledge whomever you worked with}
-% Date: {should include the date last revised}
-% Then start your code, i.e.
+% Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
+% Hernandez
+% Date: 4/8/2026
 
 clc;
 clear;
@@ -141,18 +144,15 @@ xlabel('Number of Panels (N)')
 ylabel('Coefficient of Lift (C_L)')
 legend('Calculated C_L','C_L Exact','1% Error Bounds')
 
-<<<<<<< HEAD
 %% Task 3
 
 
 
 
 %% Task 4
-=======
-%Task 4
 
 % NACA numbers 
-NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
+NACAS = [0 0 1 2; 2 4 1 2; 4 4 1 2];
 
 %angle of attack values
 ALPHAS = linspace(-10,18,29);
@@ -258,17 +258,20 @@ title('Effect of Camber on Lift')
 legend('NACA 0012', 'NACA 2412', 'NACA 4412','NACA 0012 TAT','NACA 2412 TAT', ...
     'NACA 4412 TAT','NACA 0012 Exp', 'NACA 2412 Exp', 'NACA 4412 Exp')
 
->>>>>>> a4abee6db700dddac75689e3ba6ab0a71b31ea18
-
 %% Functions
 
 function [x_b,y_b,x_camber,y_camber] = NACA_Airfoils(m,p,t,c,N)
-%NewFunction Summary of this function goes here
-% Detailed explanation goes here
+% Reads in given airfoil atributes as well as a chosen number of panels and
+% returns the x and y values of the airfoils shape, which can then be
+% graphed. It also for cambered airfoils provides the mean camber line.
 %
-% Author: {primary author, should be you}
-% Collaborators: J. Doe, J. Smith {acknowledge whomever you worked with}
-% Date: {should include the date last revised}
+% Author: Sam Wieder
+% Collaborators: Michael McAllister
+% Date: 4/8/2026
+
+% Reading in N values to calculate values of x and flipping it to make it
+% easier to use. We then calculated y_t and set up zero matricies for the
+% next for loop.
 [x_value] = x_values(c, N);
 x = fliplr(x_value(1:N));
 x_c = x/c;
@@ -276,6 +279,8 @@ y_t = (t/0.2) * c * (0.2969 * sqrt(x_c) - 0.1260 * x_c - 0.3516 * x_c.^2 + 0.284
 y_c = zeros(1,N);
 dy_dx = zeros(1,N);
 
+% If statment to calculate y_c and dy_dx which are then used to calculate x
+% and y upper and lower.
 if m ~= 0 && p ~= 0
     for i = 1:N
         if x(i) < p * c
@@ -288,19 +293,25 @@ if m ~= 0 && p ~= 0
     end
 end
 
+% Finding the camber arrays used for plotting
 x_camber = x;
 y_camber = y_c;
 
+% Calculating zeta to be used below
 zeta = atan(dy_dx);
 
+% Calculating the upper and lower values for both x and y
 x_U = x - y_t .* sin(zeta);
 x_L = x + y_t .* sin(zeta);
 y_U = y_c + y_t .* cos(zeta);
 y_L = y_c - y_t .* cos(zeta);
 
+% Flipping the lower so that we are going from trailing edge to leading
+% edge and back to trailing.
 x_lower = fliplr(x_L);
 y_lower = fliplr(y_L);
 
+% Stitching to matrices to find x_b and y_b.
 x_b = [x_lower,x_U];
 y_b = [y_lower,y_U];
 
@@ -458,15 +469,24 @@ CL = 2*CIRCULATION/CHORD;
 end
 
 function [N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m,p,t,c)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Completes Task 2. THis function reads in a CL value, angle of attach, and
+% given airfoil values and spits out a CL, error in that CL, and a minimum
+% number of panels to be within 1% error.
+%
+% Author: Sam Wieder
+% Collaborators: Michael McAllister
+
+% Creating array for the number of panels we want to run at a maximum.
 N_array = linspace(2,251,250);
 
+% For loop where we run through each N value in the array and calculate its
+% related Coefficient of Lift
 for i = 1:length(N_array)
     [x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N_array(i));
     [CL(i)] = Vortex_Panel(x_b1,y_b1,ALPHA);
 end
 
+% Calculation of relative error, using a relative error equation.
 CL_error = abs(((CL - CL_exact) ./ (CL + CL_exact)) * 200);
 
 N_min = 2 * 35; % By visual inspection of indexing
