@@ -217,10 +217,10 @@ lift_slope_0012_pred = p_0012_pred(1)
 p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
 lift_TAT = p_TAT(1)
 
-%% Task 4
+%Task 4
 
 % NACA numbers 
-NACAS = [0 0 1 2; 2 4 1 2; 4 4 1 2];
+NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
 
 %angle of attack values
 ALPHAS = linspace(-10,18,29);
@@ -255,7 +255,7 @@ m = digit2(1) / 100;
 p = digit2(2) / 10;
 t = (digit2(3) * 10 + digit2(4)) / 100;
 c = 1; % Unit value
-N2 = 34;
+N2 = 70;
 [x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N2);
 
 CL2 = zeros(1, length(ALPHAS));
@@ -314,8 +314,8 @@ end
 liftslopes = [VPlift_slope; TAT_lift_slope; exp_slope];
 allalphaL0 = [VPalpha_L0; TATalphaL0; expalphaL0];
 %plotting experimental data 
-plot(NACAchartalphas, NACA0012Cl, 'o', 'MarkerSize', 5)
-plot(NACAchartalphas, NACA2412Cl, 's', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA0012Cl, '^', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA2412Cl, '^', 'MarkerSize', 5)
 plot(NACAchartalphas, NACA4412Cl, '^', 'MarkerSize', 5)
 grid on;
 
