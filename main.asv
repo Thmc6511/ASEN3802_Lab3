@@ -1,9 +1,13 @@
-%% ASEN 3802 - Lab 3 - Main Code
-% Provide a breif summary of the problem statement and code so that
-% you or someone else can later understand what you attempted to do
-% it doesn’t have to be that long.
+%% ASEN 3802 - Lab 3: Part 1&2 - Main Code
+% This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
+% reads in airfoil traits and returns x and y values of an airfoils shape.
+% Task 2 find CL and compares error of this calculated value to an "exact
+% value. Task 3 calculates and takes in AoA vs CL from experimental data
+% and using thin airfoil theory. Task 4 calculates the AoA vs CL using the
+% methods created in Task 1 and Task 2, then plots these results against
+% task 3.
 %
-% Author: Sam Wieder, Michael McAllister, Carson Schlageter, David
+% Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
 % Hernandez
 % Date: 4/8/2026
 
@@ -142,13 +146,81 @@ legend('Calculated C_L','C_L Exact','1% Error Bounds')
 
 %% Task 3
 
+% Experimental data read in
+Exp_NACA_0006 = readmatrix("NACA 0006.csv");
+Exp_NACA_0006_x = Exp_NACA_0006(:,1);
+Exp_NACA_0006_y = Exp_NACA_0006(:,2);
+Exp_NACA_0012 = readmatrix("NACA 0012.csv");
+Exp_NACA_0012_x = Exp_NACA_0012(:,1);
+Exp_NACA_0012_y = Exp_NACA_0012(:,2);
 
+% Thin Airfoil cl vs alpha
 
+alpha_ThinAir = -10:0.5:10;
+CL_ThinAir = (alpha_ThinAir*pi/180)*(2*pi);
+
+% NACA 0006 cl vs alpha
+
+alpha_0006 = -10:0.5:10;
+[x_0006,y_0006] = NACA_Airfoils(0,0,0.06,1,69);
+for i=1:length(alpha_0006)
+    CL_0006(i) = Vortex_Panel(x_0006, y_0006, alpha_0006(i));
+end
+
+% NACA 0012 cl vs alpha
+
+alpha_0012 = -10:0.5:10;
+[x_0012,y_0012] = NACA_Airfoils(0,0,0.12,1,69);
+for i=1:length(alpha_0012)
+    CL_0012(i) = Vortex_Panel(x_0012, y_0012, alpha_0012(i));
+end
+
+% NACA 0018 cl vs alpha
+
+alpha_0018 = -10:0.5:10;
+[x_0018,y_0018] = NACA_Airfoils(0,0,0.18,1,69);
+for i=1:length(alpha_0018)
+    CL_0018(i) = Vortex_Panel(x_0018, y_0018, alpha_0018(i));
+end
+
+% Plotting all onto one plot
+figure()
+plot(alpha_0006, CL_0006, LineWidth=1)
+hold on
+plot(alpha_0012, CL_0012, LineWidth=1)
+plot(alpha_0018, CL_0018, LineWidth=1)
+plot(Exp_NACA_0006_x, Exp_NACA_0006_y, LineWidth=1)
+plot(Exp_NACA_0012_x, Exp_NACA_0012_y, LineWidth=1)
+plot(alpha_ThinAir,CL_ThinAir, LineWidth=1)
+xlim([-10,10])
+title('\alpha vs c_L (Predicted, Experimental, & TAT)')
+xlabel('\alpha')
+ylabel('c_l')
+legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.', 'NACA 0012 Exp.', 'Thin Airfoil Plot', Location='northwest')
+
+% Find slope for all
+p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
+lift_slope_0006_pred = p_0006_pred(1);
+
+p_0012_pred = polyfit(alpha_0012, CL_0012, 1);
+lift_slope_0012_pred = p_0012_pred(1);
+
+p_0018_pred = polyfit(alpha_0018, CL_0018, 1);
+lift_slope_0018_pred = p_0018_pred(1);
+
+p_0006_pred = polyfit(Exp_NACA_0006_x, Exp_NACA_0006_y, 1);
+lift_slope_0006_pred = p_0006_pred(1);
+
+p_0012_pred = polyfit(Exp_NACA_0012_x, Exp_NACA_0012_y, 1);
+lift_slope_0012_pred = p_0012_pred(1);
+
+p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
+lift_TAT = p_TAT(1);
 
 %% Task 4
 
 % NACA numbers 
-NACAS = [0 0 1 2; 2 4 1 2; 4 4 1 2];
+NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
 
 %angle of attack values
 ALPHAS = linspace(-10,18,29);
@@ -159,6 +231,14 @@ NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.4
 NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
 %angle of attack values corresponding to NACA chart Cl values
 NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
+
+%% Part 2
+
+
+
+[e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N);
+
+%% Functions
 
 %storing lift slope of experimental data
 EXP_NACAS = {NACA0012Cl NACA2412Cl NACA4412Cl};
@@ -183,7 +263,7 @@ m = digit2(1) / 100;
 p = digit2(2) / 10;
 t = (digit2(3) * 10 + digit2(4)) / 100;
 c = 1; % Unit value
-N2 = 34;
+N2 = 70;
 [x_b1,y_b1] = NACA_Airfoils(m,p,t,c,N2);
 
 CL2 = zeros(1, length(ALPHAS));
@@ -242,8 +322,8 @@ end
 liftslopes = [VPlift_slope; TAT_lift_slope; exp_slope];
 allalphaL0 = [VPalpha_L0; TATalphaL0; expalphaL0];
 %plotting experimental data 
-plot(NACAchartalphas, NACA0012Cl, 'o', 'MarkerSize', 5)
-plot(NACAchartalphas, NACA2412Cl, 's', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA0012Cl, '^', 'MarkerSize', 5)
+plot(NACAchartalphas, NACA2412Cl, '^', 'MarkerSize', 5)
 plot(NACAchartalphas, NACA4412Cl, '^', 'MarkerSize', 5)
 grid on;
 
@@ -302,10 +382,12 @@ x_L = x + y_t .* sin(zeta);
 y_U = y_c + y_t .* cos(zeta);
 y_L = y_c - y_t .* cos(zeta);
 
-% Fl
+% Flipping the lower so that we are going from trailing edge to leading
+% edge and back to trailing.
 x_lower = fliplr(x_L);
 y_lower = fliplr(y_L);
 
+% Stitching to matrices to find x_b and y_b.
 x_b = [x_lower,x_U];
 y_b = [y_lower,y_U];
 

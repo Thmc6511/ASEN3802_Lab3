@@ -1,4 +1,4 @@
-%% ASEN 3802 - Lab 3: Part 1 - Main Code
+%% ASEN 3802 - Lab 3: Part 1&2 - Main Code
 % This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
 % reads in airfoil traits and returns x and y values of an airfoils shape.
 % Task 2 find CL and compares error of this calculated value to an "exact
@@ -231,6 +231,22 @@ NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.4
 NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
 %angle of attack values corresponding to NACA chart Cl values
 NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
+
+%% Part 2
+
+b = ;
+a0_t = ;
+a0_r = ;
+c_t = ;
+c_r = ;
+aero_t = ;
+aero_r = ;
+geo_t = ;
+geo_r = ;
+
+[e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N);
+
+%% Functions
 
 %storing lift slope of experimental data
 EXP_NACAS = {NACA0012Cl NACA2412Cl NACA4412Cl};
@@ -558,6 +574,14 @@ end
 CL_error = abs(((CL - CL_exact) ./ (CL + CL_exact)) * 200);
 
 N_min = 2 * 35; % By visual inspection of indexing
+
+end
+
+%% Part 2 Function
+
+function [e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N)
+
+
 
 end
 
