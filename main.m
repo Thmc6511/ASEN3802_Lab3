@@ -5,11 +5,13 @@
 % value. Task 3 calculates and takes in AoA vs CL from experimental data
 % and using thin airfoil theory. Task 4 calculates the AoA vs CL using the
 % methods created in Task 1 and Task 2, then plots these results against
-% task 3.
+% task 3. Added Part 2, Task 1, which uses PLLT to calculate induced
+% drag, it inputs various lift slope, chord lengths, and twists and
+% outputs of span efficiency, C_L, and C_D.
 %
 % Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
 % Hernandez
-% Date: 4/8/2026
+% Date: 4/14/2026
 
 clc;
 clear;
@@ -60,7 +62,7 @@ h1 = plot(x_b1, y_b1, '-','Color', 'b', 'LineWidth', 1.8, 'DisplayName', 'NACA 0
 h2 = plot(x_b1, y_b1, 'o','Color', 'b', 'MarkerFaceColor', 'b', 'MarkerSize', 4.5, 'DisplayName', 'NACA 0021 Panel Points'); 
 % Chord line reference
 h3 = plot([0, c], [0, 0], '--','Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
- 
+
 hold off;
 grid on;
 axis equal;
@@ -74,11 +76,11 @@ xlim([-x_margin, c + x_margin]);
 ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
 legend([h1, h2, h3], ...
     'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
- 
+
 % Figure 2 - NACA 2421
 figure('Units', 'inches', 'Position', [2, 2, 10, 7]);
 hold on;
- 
+
 % Surface line
 h4 = plot(x_b2, y_b2, '-', 'Color', 'r', 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Surface');
 % Panel boundary points
@@ -87,7 +89,7 @@ h5 = plot(x_b2, y_b2, 's', 'Color', 'r', 'MarkerFaceColor', 'r', 'MarkerSize', 4
 h6 = plot(x_camber, y_camber, '--', 'Color', [0.7, 0.3, 0.9], 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Camber Line');
 % Chord line reference
 h7 = plot([0, c], [0, 0], '--', 'Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
- 
+
 hold off;
 grid on;
 axis equal;
@@ -234,17 +236,57 @@ NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
 
 %% Part 2
 
-b = ;
-a0_t = ;
-a0_r = ;
-c_t = ;
-c_r = ;
-aero_t = ;
-aero_r = ;
-geo_t = ;
-geo_r = ;
+N = 50;  
+ 
+a0_t = 2 * pi; 
+a0_r = 2 * pi; 
+aero_t = 0; 
+aero_r = 0; 
+geo_t = 5; 
+geo_r = 5;
 
-[e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N);
+% Aspect ratios and taper ratios to sweep
+AR_list = [4, 6, 8, 10];
+lambda_list = linspace(0, 1.0, 100); % Lambda = c_t / c_r   
+
+% Pre-allocate storage
+delta_matrix = zeros(length(AR_list), length(lambda_list));
+
+% Going through various AR and lambda's
+for i = 1:length(AR_list)
+    AR = AR_list(i);
+
+    for j = 1:length(lambda_list)
+        lambda = lambda_list(j); 
+        % Calculating c_r, c_t, and b to put into the PLLT function
+        c_r = 1.0;
+        c_t = lambda * c_r;
+        b = AR * (c_r + c_t) / 2;
+        [e, c_L, c_Di] = PLLT(b, a0_t, a0_r, c_t, c_r, aero_t, aero_r, geo_t, geo_r, N);
+
+        % Delta from span efficiency
+        delta_matrix(i, j) = 1/e - 1;
+
+        % Outputting e, c_L, and c_Di
+        e(j) = e;
+        c_L(j) = c_L;
+        c_Di(j) = c_Di;
+    end
+end
+
+% The plot
+figure;
+hold on;
+for k = 1:length(AR_list)
+    plot(lambda_list, delta_matrix(k,:), 'DisplayName', sprintf('AR = %d', AR_list(k)));
+end
+xlabel('Taper Ratio, c_t/c_r');
+ylabel('Induced Drag Factor, delta');
+title('Induced Drag Factor vs. Taper Ratio (Anderson Fig. 5.20)');
+legend;
+grid on;
+xlim([0, 1]);
+ylim([0, 0.2]);
 
 %% Functions
 
@@ -581,7 +623,64 @@ end
 
 function [e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N)
 
+% Function that completes the Prandtl Lifting Line Theorem. It feeds in the
+% span, lift slopes, chord length at root and tip, and aerodynamic and
+% geometric twists at the root and tip. It outputs the Span efficiency
+% factor, the coefficient of lift, and the coefficient of induced drag.
+%
+% Authors: Sam Wieder, Michael McAllister
+% Collaberators: Carson Schlageter, David Hernandez
+% Date: 4/14/2026
+    % Convert all angles from degrees to radians
+    aero_t = deg2rad(aero_t);
+    aero_r = deg2rad(aero_r);
+    geo_t = deg2rad(geo_t);
+    geo_r = deg2rad(geo_r);
 
+    % Collocation points
+    i = (1:N)';
+    theta = i * pi / (2*N);
+    frac = cos(theta);
+
+    % Linearization to find local values
+    a0_loc = a0_r + (a0_t - a0_r) .* frac;
+    c_loc = c_r + (c_t - c_r) .* frac;
+    aero_loc = aero_r + (aero_t - aero_r) .* frac;
+    geo_loc = geo_r + (geo_t - geo_r) .* frac;
+
+    % Odd Fourier term indices
+    n_odd = 2*(1:N) - 1;
+
+    % Build [N x N] matrix 
+    M = zeros(N, N);
+    for i = 1:N
+        for j = 1:N
+            n = n_odd(j);
+            M(i,j) = sin(n * theta(i)) * (4*b / (a0_loc(i) * c_loc(i)) + n / sin(theta(i)));
+        end
+    end
+
+    % Effective angle of attack
+    A_eff = geo_loc - aero_loc;
+    A = M \ A_eff;
+
+    % Wing area and aspect ratio
+    S = b * (c_r + c_t) / 2;
+    AR = b^2 / S;
+
+    % Lift coefficient
+    c_L = pi * AR * A(1);
+
+    % Induced drag factor delta
+    delta = 0;
+    for j = 2:N
+        n = n_odd(j);
+        delta = delta + n * (A(j) / A(1))^2;
+    end
+
+    % Span efficiency and induced drag
+    e = 1 / (1 + delta);
+    c_Di = c_L^2 / (pi * AR * e);
 
 end
 

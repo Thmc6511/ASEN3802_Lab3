@@ -2,10 +2,7 @@ clear;
 clc;
 close all;
 
-N = 50;          
-a0_uniform = 2 * pi;     
-geo_angle = 5; % Guess           
-aero_angle = 0;    
+N = 50;  
  
 a0_t = 2 * pi; 
 a0_r = 2 * pi; 
@@ -16,7 +13,7 @@ geo_r = 5;
 
 % Aspect ratios and taper ratios to sweep
 AR_list = [4, 6, 8, 10];
-lambda_list = linspace(0.0, 1.0, 60);   
+lambda_list = linspace(0, 1.0, 100);   
 
 % Pre-allocate storage
 delta_matrix = zeros(length(AR_list), length(lambda_list));
@@ -68,8 +65,8 @@ function [e, c_L, c_Di] = PLLT(b, a0_t, a0_r, c_t, c_r, aero_t, aero_r, geo_t, g
     % Linearization to find local values
     a0_loc = a0_r + (a0_t - a0_r  ) .* frac;
     c_loc = c_r + (c_t - c_r) .* frac;
-    aL0_loc = aero_r + (aero_t - aero_r) .* frac;
-    alpha_loc = geo_r + (geo_t  - geo_r ) .* frac;
+    aero_loc = aero_r + (aero_t - aero_r) .* frac;
+    geo_loc = geo_r + (geo_t  - geo_r ) .* frac;
 
     % Odd Fourier term indices
     n_odd = 2*(1:N) - 1;
@@ -84,7 +81,7 @@ function [e, c_L, c_Di] = PLLT(b, a0_t, a0_r, c_t, c_r, aero_t, aero_r, geo_t, g
     end
 
     % Effective angle of attack
-    A_eff = alpha_loc - aL0_loc;
+    A_eff = geo_loc - aero_loc;
     A = M \ A_eff;
 
     % Wing area and aspect ratio
