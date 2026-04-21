@@ -348,12 +348,28 @@ for i = 1:length(N_3)
     [e_3(i), c_L_3(i), c_Di_3(i)] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3(i));
 end
 
+AoA
+
+for i = 1:length(AoA_span)
+    [e_AoA(i), c_L_AoA(i), c_Di_AoA(i)] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, 25);
+end
+
+figure()
+hold on;
+grid on;
+plot(N_3,c_L_3,'LineWidth',1.5,'Marker','.','MarkerSize',10)
+
+figure()
+hold on;
+grid on;
+plot(N_3,c_Di_3,'LineWidth',1.5,'Marker','.','MarkerSize',10)
+
 c_d_r = 0.008;
 c_d_t = 0.006;
 
 cd_profile = (c_d_r * c_r_3 + c_d_t * c_t_3) / (c_r_3 + c_t_3);
 
-CD_3 = cd_profile 
+CD_3 = cd_profile + c_Di_3(end);
 
 % Calculate Lift and Drag
 
@@ -365,17 +381,8 @@ rho_10k = 0.001756;
 S = 0.5 * b_3 * (c_r_3 + c_t_3);
 q_inf = 0.5 * rho_10k * V_cruise^2;
 
-
 L = q_inf * S * c_L_3(end);
-D = q_inf * S * c_L_3;
-
-figure()
-hold on;
-plot(N_3,c_L_3)
-
-figure()
-hold on;
-plot(N_3,c_Di_3)
+D = q_inf * S * CD_3;
 
 %% Functions
 
