@@ -1,237 +1,238 @@
-% %% ASEN 3802 - Lab 3: Part 1&2 - Main Code
-% % This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
-% % reads in airfoil traits and returns x and y values of an airfoils shape.
-% % Task 2 find CL and compares error of this calculated value to an "exact
-% % value. Task 3 calculates and takes in AoA vs CL from experimental data
-% % and using thin airfoil theory. Task 4 calculates the AoA vs CL using the
-% % methods created in Task 1 and Task 2, then plots these results against
-% % task 3. Added Part 2, Task 1, which uses PLLT to calculate induced
-% drag, 
-% %
-% % Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
-% % Hernandez
-% % Date: 4/8/2026
-% 
-% clc;
-% clear;
-% close all
-% 
-% %% Read in NACA files
-% 
-% % Defining NACA airfoil for 0021
-% NACA_1 = '0021';
-% 
-% % Turning Matrix into an array of each digit
-% for i = 1:4
-%     digit_1(i) = str2num(NACA_1(i));
-% end
-% 
-% % Defining the airfoil parameters
-% m_1 = digit_1(1) / 100;
-% p_1 = digit_1(2) / 10;
-% t_1 = (digit_1(3) * 10 + digit_1(4)) / 100;
-% c = 1;
-% N = 50;
-% 
-% % Airfoil function
-% [x_b1,y_b1,~,~] = NACA_Airfoils(m_1,p_1,t_1,c,N);
-% 
-% % Defining NACA airfoil for 2421
-% NACA_2 = '2421';
-% 
-% % Turning Matrix into an array of each digit
-% for i = 1:4
-%     digit_2(i) = str2num(NACA_2(i));
-% end
-% 
-% % Defining the airfoil parameters
-% m_2 = digit_2(1) / 100;
-% p_2 = digit_2(2) / 10;
-% t_2 = (digit_2(3) * 10 + digit_2(4)) / 100;
-% 
-% % Airfoil function
-% [x_b2,y_b2,x_camber,y_camber] = NACA_Airfoils(m_2,p_2,t_2,c,N);
-% 
-% % Figure 1 - NACA 0021
-% figure('Units', 'inches', 'Position', [1, 1, 10, 7]);
-% hold on;
-% % Surface line
-% h1 = plot(x_b1, y_b1, '-','Color', 'b', 'LineWidth', 1.8, 'DisplayName', 'NACA 0021 Surface');
-% % Panel boundary points
-% h2 = plot(x_b1, y_b1, 'o','Color', 'b', 'MarkerFaceColor', 'b', 'MarkerSize', 4.5, 'DisplayName', 'NACA 0021 Panel Points'); 
-% % Chord line reference
-% h3 = plot([0, c], [0, 0], '--','Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
-% 
-% hold off;
-% grid on;
-% axis equal;
-% % Labels, titles, and tidying
-% xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
-% ylabel('y/c', 'FontSize', 14, 'FontWeight', 'bold');
-% title('NACA 0021 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
-% x_margin = 0.05 * c;
-% y_margin = 0.15 * c;
-% xlim([-x_margin, c + x_margin]);
-% ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
-% legend([h1, h2, h3], ...
-%     'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
-% 
-% % Figure 2 - NACA 2421
-% figure('Units', 'inches', 'Position', [2, 2, 10, 7]);
-% hold on;
-% 
-% % Surface line
-% h4 = plot(x_b2, y_b2, '-', 'Color', 'r', 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Surface');
-% % Panel boundary points
-% h5 = plot(x_b2, y_b2, 's', 'Color', 'r', 'MarkerFaceColor', 'r', 'MarkerSize', 4.5, 'DisplayName', 'NACA 2421 Panel Points');
-% % Camber line
-% h6 = plot(x_camber, y_camber, '--', 'Color', [0.7, 0.3, 0.9], 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Camber Line');
-% % Chord line reference
-% h7 = plot([0, c], [0, 0], '--', 'Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
-% 
-% hold off;
-% grid on;
-% axis equal;
-% % Labels, titles, and tidying
-% xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
-% ylabel('y/c ', 'FontSize', 14, 'FontWeight', 'bold');
-% title('NACA 2421 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
-% x_margin = 0.05 * c;
-% y_margin = 0.15 * c;
-% xlim([-x_margin, c + x_margin]);
-% ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
-% legend([h4, h5, h6, h7], ...
-%     'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
-% 
-% %% Task 2
-% 
-% % Defining the '0012' Airfoil for Task 2 calculations
-% NACA_3 = '0012';
-% 
-% % Turning Matrix into an array of each digit
-% for i = 1:4
-%     digit_3(i) = str2num(NACA_3(i));
-% end
-% 
-% % Defining the airfoil parameters
-% m_3 = digit_3(1) / 100;
-% p_3 = digit_3(2) / 10;
-% t_3 = (digit_3(3) * 10 + digit_3(4)) / 100;
-% 
-% % Defining Alpha
-% ALPHA = 12;
-% 
-% % Using a very large number of N to calculate for Cl_exact
-% [x_exact,y_exact] = NACA_Airfoils(m_3,p_3,t_3,c,1000);
-% [CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
-% 
-% % Printing our Exact Cl value to Command Window
-% fprintf('Exact Cl value: %f \n',CL_exact)
-% 
-% % Function to calculate N vs Cl
-% [N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m_3,p_3,t_3,c);
-% 
-% % Plotting for Task 2
-% figure()
-% plot(2 * N_array,CL)
-% hold on;
-% yline(CL_exact, 'k')
-% yline(CL_exact + 0.01 * CL_exact,'r--')
-% yline(CL_exact - 0.01 * CL_exact,'r--')
-% xlim([0,400])
-% grid on;
-% title('Number of Panels vs Coefficient of Lift for NACA 0012')
-% xlabel('Number of Panels (N)')
-% ylabel('Coefficient of Lift (C_L)')
-% legend('Calculated C_L','C_L Exact','1% Error Bounds')
-% 
-% %% Task 3
-% 
-% % Experimental data read in
-% Exp_NACA_0006 = readmatrix("NACA 0006.csv");
-% Exp_NACA_0006_x = Exp_NACA_0006(:,1);
-% Exp_NACA_0006_y = Exp_NACA_0006(:,2);
-% Exp_NACA_0012 = readmatrix("NACA 0012.csv");
-% Exp_NACA_0012_x = Exp_NACA_0012(:,1);
-% Exp_NACA_0012_y = Exp_NACA_0012(:,2);
-% 
-% % Thin Airfoil cl vs alpha
-% 
-% alpha_ThinAir = -10:0.5:10;
-% CL_ThinAir = (alpha_ThinAir*pi/180)*(2*pi);
-% 
-% % NACA 0006 cl vs alpha
-% 
-% alpha_0006 = -10:0.5:10;
-% [x_0006,y_0006] = NACA_Airfoils(0,0,0.06,1,69);
-% for i=1:length(alpha_0006)
-%     CL_0006(i) = Vortex_Panel(x_0006, y_0006, alpha_0006(i));
-% end
-% 
-% % NACA 0012 cl vs alpha
-% 
-% alpha_0012 = -10:0.5:10;
-% [x_0012,y_0012] = NACA_Airfoils(0,0,0.12,1,69);
-% for i=1:length(alpha_0012)
-%     CL_0012(i) = Vortex_Panel(x_0012, y_0012, alpha_0012(i));
-% end
-% 
-% % NACA 0018 cl vs alpha
-% 
-% alpha_0018 = -10:0.5:10;
-% [x_0018,y_0018] = NACA_Airfoils(0,0,0.18,1,69);
-% for i=1:length(alpha_0018)
-%     CL_0018(i) = Vortex_Panel(x_0018, y_0018, alpha_0018(i));
-% end
-% 
-% % Plotting all onto one plot
-% figure()
-% plot(alpha_0006, CL_0006, LineWidth=1)
-% hold on
-% plot(alpha_0012, CL_0012, LineWidth=1)
-% plot(alpha_0018, CL_0018, LineWidth=1)
-% plot(Exp_NACA_0006_x, Exp_NACA_0006_y, LineWidth=1)
-% plot(Exp_NACA_0012_x, Exp_NACA_0012_y, LineWidth=1)
-% plot(alpha_ThinAir,CL_ThinAir, LineWidth=1)
-% xlim([-10,10])
-% title('\alpha vs c_L (Predicted, Experimental, & TAT)')
-% xlabel('\alpha')
-% ylabel('c_l')
-% legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.', 'NACA 0012 Exp.', 'Thin Airfoil Plot', Location='northwest')
-% 
-% % Find slope for all
-% p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
-% lift_slope_0006_pred = p_0006_pred(1);
-% 
-% p_0012_pred = polyfit(alpha_0012, CL_0012, 1);
-% lift_slope_0012_pred = p_0012_pred(1);
-% 
-% p_0018_pred = polyfit(alpha_0018, CL_0018, 1);
-% lift_slope_0018_pred = p_0018_pred(1);
-% 
-% p_0006_pred = polyfit(Exp_NACA_0006_x, Exp_NACA_0006_y, 1);
-% lift_slope_0006_pred = p_0006_pred(1);
-% 
-% p_0012_pred = polyfit(Exp_NACA_0012_x, Exp_NACA_0012_y, 1);
-% lift_slope_0012_pred = p_0012_pred(1);
-% 
-% p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
-% lift_TAT = p_TAT(1);
-% 
-% %% Task 4
-% 
-% % NACA numbers 
-% NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
-% 
-% %angle of attack values
-% ALPHAS = linspace(-10,18,29);
-% 
-% %experimental data from NACA charts 
-% NACA0012Cl = [-1.1 -.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1.1 1.3 1.35 1.4 1.5 1.6 1.3 1];
-% NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.45];
-% NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
-% %angle of attack values corresponding to NACA chart Cl values
-% NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
+%% ASEN 3802 - Lab 3: Part 1&2 - Main Code
+% This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
+% reads in airfoil traits and returns x and y values of an airfoils shape.
+% Task 2 find CL and compares error of this calculated value to an "exact
+% value. Task 3 calculates and takes in AoA vs CL from experimental data
+% and using thin airfoil theory. Task 4 calculates the AoA vs CL using the
+% methods created in Task 1 and Task 2, then plots these results against
+% task 3. Added Part 2, Task 1, which uses PLLT to calculate induced
+% drag, it inputs various lift slope, chord lengths, and twists and
+% outputs of span efficiency, C_L, and C_D.
+%
+% Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
+% Hernandez
+% Date: 4/14/2026
+
+clc;
+clear;
+close all
+
+%% Read in NACA files
+
+% Defining NACA airfoil for 0021
+NACA_1 = '0021';
+
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_1(i) = str2num(NACA_1(i));
+end
+
+% Defining the airfoil parameters
+m_1 = digit_1(1) / 100;
+p_1 = digit_1(2) / 10;
+t_1 = (digit_1(3) * 10 + digit_1(4)) / 100;
+c = 1;
+N = 50;
+
+% Airfoil function
+[x_b1,y_b1,~,~] = NACA_Airfoils(m_1,p_1,t_1,c,N);
+
+% Defining NACA airfoil for 2421
+NACA_2 = '2421';
+
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_2(i) = str2num(NACA_2(i));
+end
+
+% Defining the airfoil parameters
+m_2 = digit_2(1) / 100;
+p_2 = digit_2(2) / 10;
+t_2 = (digit_2(3) * 10 + digit_2(4)) / 100;
+
+% Airfoil function
+[x_b2,y_b2,x_camber,y_camber] = NACA_Airfoils(m_2,p_2,t_2,c,N);
+
+% Figure 1 - NACA 0021
+figure('Units', 'inches', 'Position', [1, 1, 10, 7]);
+hold on;
+% Surface line
+h1 = plot(x_b1, y_b1, '-','Color', 'b', 'LineWidth', 1.8, 'DisplayName', 'NACA 0021 Surface');
+% Panel boundary points
+h2 = plot(x_b1, y_b1, 'o','Color', 'b', 'MarkerFaceColor', 'b', 'MarkerSize', 4.5, 'DisplayName', 'NACA 0021 Panel Points'); 
+% Chord line reference
+h3 = plot([0, c], [0, 0], '--','Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
+
+hold off;
+grid on;
+axis equal;
+% Labels, titles, and tidying
+xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
+ylabel('y/c', 'FontSize', 14, 'FontWeight', 'bold');
+title('NACA 0021 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
+x_margin = 0.05 * c;
+y_margin = 0.15 * c;
+xlim([-x_margin, c + x_margin]);
+ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
+legend([h1, h2, h3], ...
+    'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
+
+% Figure 2 - NACA 2421
+figure('Units', 'inches', 'Position', [2, 2, 10, 7]);
+hold on;
+
+% Surface line
+h4 = plot(x_b2, y_b2, '-', 'Color', 'r', 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Surface');
+% Panel boundary points
+h5 = plot(x_b2, y_b2, 's', 'Color', 'r', 'MarkerFaceColor', 'r', 'MarkerSize', 4.5, 'DisplayName', 'NACA 2421 Panel Points');
+% Camber line
+h6 = plot(x_camber, y_camber, '--', 'Color', [0.7, 0.3, 0.9], 'LineWidth', 1.8, 'DisplayName', 'NACA 2421 Camber Line');
+% Chord line reference
+h7 = plot([0, c], [0, 0], '--', 'Color', 'k', 'LineWidth', 1.2, 'DisplayName', 'Chord Line');
+
+hold off;
+grid on;
+axis equal;
+% Labels, titles, and tidying
+xlabel('x/c', 'FontSize', 14, 'FontWeight', 'bold');
+ylabel('y/c ', 'FontSize', 14, 'FontWeight', 'bold');
+title('NACA 2421 Panel Geometry', 'FontSize', 14, 'FontWeight', 'bold');
+x_margin = 0.05 * c;
+y_margin = 0.15 * c;
+xlim([-x_margin, c + x_margin]);
+ylim([-0.20*c - y_margin, 0.20*c + y_margin]);
+legend([h4, h5, h6, h7], ...
+    'Location', 'northeast', 'FontSize', 11, 'Box', 'on');
+
+%% Task 2
+
+% Defining the '0012' Airfoil for Task 2 calculations
+NACA_3 = '0012';
+
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_3(i) = str2num(NACA_3(i));
+end
+
+% Defining the airfoil parameters
+m_3 = digit_3(1) / 100;
+p_3 = digit_3(2) / 10;
+t_3 = (digit_3(3) * 10 + digit_3(4)) / 100;
+
+% Defining Alpha
+ALPHA = 12;
+
+% Using a very large number of N to calculate for Cl_exact
+[x_exact,y_exact] = NACA_Airfoils(m_3,p_3,t_3,c,1000);
+[CL_exact] = Vortex_Panel(x_exact,y_exact,ALPHA);
+
+% Printing our Exact Cl value to Command Window
+fprintf('Exact Cl value: %f \n',CL_exact)
+
+% Function to calculate N vs Cl
+[N_min,CL_error,N_array,CL] = task2(CL_exact,ALPHA,m_3,p_3,t_3,c);
+
+% Plotting for Task 2
+figure()
+plot(2 * N_array,CL)
+hold on;
+yline(CL_exact, 'k')
+yline(CL_exact + 0.01 * CL_exact,'r--')
+yline(CL_exact - 0.01 * CL_exact,'r--')
+xlim([0,400])
+grid on;
+title('Number of Panels vs Coefficient of Lift for NACA 0012')
+xlabel('Number of Panels (N)')
+ylabel('Coefficient of Lift (C_L)')
+legend('Calculated C_L','C_L Exact','1% Error Bounds')
+
+%% Task 3
+
+% Experimental data read in
+Exp_NACA_0006 = readmatrix("NACA 0006.csv");
+Exp_NACA_0006_x = Exp_NACA_0006(:,1);
+Exp_NACA_0006_y = Exp_NACA_0006(:,2);
+Exp_NACA_0012 = readmatrix("NACA 0012.csv");
+Exp_NACA_0012_x = Exp_NACA_0012(:,1);
+Exp_NACA_0012_y = Exp_NACA_0012(:,2);
+
+% Thin Airfoil cl vs alpha
+
+alpha_ThinAir = -10:0.5:10;
+CL_ThinAir = (alpha_ThinAir*pi/180)*(2*pi);
+
+% NACA 0006 cl vs alpha
+
+alpha_0006 = -10:0.5:10;
+[x_0006,y_0006] = NACA_Airfoils(0,0,0.06,1,69);
+for i=1:length(alpha_0006)
+    CL_0006(i) = Vortex_Panel(x_0006, y_0006, alpha_0006(i));
+end
+
+% NACA 0012 cl vs alpha
+
+alpha_0012 = -10:0.5:10;
+[x_0012,y_0012] = NACA_Airfoils(0,0,0.12,1,69);
+for i=1:length(alpha_0012)
+    CL_0012(i) = Vortex_Panel(x_0012, y_0012, alpha_0012(i));
+end
+
+% NACA 0018 cl vs alpha
+
+alpha_0018 = -10:0.5:10;
+[x_0018,y_0018] = NACA_Airfoils(0,0,0.18,1,69);
+for i=1:length(alpha_0018)
+    CL_0018(i) = Vortex_Panel(x_0018, y_0018, alpha_0018(i));
+end
+
+% Plotting all onto one plot
+figure()
+plot(alpha_0006, CL_0006, LineWidth=1)
+hold on
+plot(alpha_0012, CL_0012, LineWidth=1)
+plot(alpha_0018, CL_0018, LineWidth=1)
+plot(Exp_NACA_0006_x, Exp_NACA_0006_y, LineWidth=1)
+plot(Exp_NACA_0012_x, Exp_NACA_0012_y, LineWidth=1)
+plot(alpha_ThinAir,CL_ThinAir, LineWidth=1)
+xlim([-10,10])
+title('\alpha vs c_L (Predicted, Experimental, & TAT)')
+xlabel('\alpha')
+ylabel('c_l')
+legend('NACA 0006 Pred.', 'NACA 0012 Pred.', 'NACA 0018 Pred.', 'NACA 0006 Exp.', 'NACA 0012 Exp.', 'Thin Airfoil Plot', Location='northwest')
+
+% Find slope for all
+p_0006_pred = polyfit(alpha_0006, CL_0006, 1);
+lift_slope_0006_pred = p_0006_pred(1);
+
+p_0012_pred = polyfit(alpha_0012, CL_0012, 1);
+lift_slope_0012_pred = p_0012_pred(1);
+
+p_0018_pred = polyfit(alpha_0018, CL_0018, 1);
+lift_slope_0018_pred = p_0018_pred(1);
+
+p_0006_pred = polyfit(Exp_NACA_0006_x, Exp_NACA_0006_y, 1);
+lift_slope_0006_pred = p_0006_pred(1);
+
+p_0012_pred = polyfit(Exp_NACA_0012_x, Exp_NACA_0012_y, 1);
+lift_slope_0012_pred = p_0012_pred(1);
+
+p_TAT = polyfit(alpha_ThinAir,CL_ThinAir, 1);
+lift_TAT = p_TAT(1);
+
+%% Task 4
+
+% NACA numbers 
+NACAS = [0 0 1 2; 2 4  1 2; 4 4 1 2];
+
+%angle of attack values
+ALPHAS = linspace(-10,18,29);
+
+%experimental data from NACA charts 
+NACA0012Cl = [-1.1 -.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1.1 1.3 1.35 1.4 1.5 1.6 1.3 1];
+NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.45];
+NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
+% angle of attack values corresponding to NACA chart Cl values
+NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
 
 %% Part 2
 
@@ -246,16 +247,18 @@ geo_r = 5;
 
 % Aspect ratios and taper ratios to sweep
 AR_list = [4, 6, 8, 10];
-lambda_list = linspace(0, 1.0, 100);   
+lambda_list = linspace(0, 1.0, 100); % Lambda = c_t / c_r   
 
 % Pre-allocate storage
 delta_matrix = zeros(length(AR_list), length(lambda_list));
 
+% Going through various AR and lambda's
 for i = 1:length(AR_list)
     AR = AR_list(i);
 
     for j = 1:length(lambda_list)
-        lambda = lambda_list(j);  
+        lambda = lambda_list(j); 
+        % Calculating c_r, c_t, and b to put into the PLLT function
         c_r = 1.0;
         c_t = lambda * c_r;
         b = AR * (c_r + c_t) / 2;
@@ -264,11 +267,14 @@ for i = 1:length(AR_list)
         % Delta from span efficiency
         delta_matrix(i, j) = 1/e - 1;
 
+        % Outputting e, c_L, and c_Di
+        e(j) = e;
         c_L(j) = c_L;
         c_Di(j) = c_Di;
     end
 end
 
+% The plot
 figure;
 hold on;
 for k = 1:length(AR_list)
@@ -281,6 +287,55 @@ legend;
 grid on;
 xlim([0, 1]);
 ylim([0, 0.2]);
+
+%% Part 3
+
+Root_AF = '2412';
+Tip_AF = '0012';
+b_3 = 33.33; % ft
+c_r_3 = 5.33; % ft
+c_t_3 = 3.708; % ft
+geo_r_3 = 1;
+geo_t_3 = 0;
+aero_t_3 = 0;
+aero_r_3 = 0;
+
+%Functions for airfoils
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_r(i) = str2num(Root_AF(i));
+end
+
+% Defining the airfoil parameters
+m_r = digit_r(1) / 100;
+p_r = digit_r(2) / 10;
+t_r = (digit_r(3) * 10 + digit_r(4)) / 100;
+N_r = 50;
+
+% Airfoil function
+[x_br,y_br,~,~] = NACA_Airfoils(m_r,p_r,t_r,c_r_3,N_r);
+
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_t(i) = str2num(Tip_AF(i));
+end
+
+% Defining the airfoil parameters
+m_t = digit_t(1) / 100;
+p_t = digit_t(2) / 10;
+t_t = (digit_t(3) * 10 + digit_t(4)) / 100;
+
+N_t = 50;
+
+% Airfoil function
+[x_bt,y_bt,x_camber_t,y_camber_t] = NACA_Airfoils(m_t,p_t,t_t,c_t_3,N_t);
+
+
+a0_t_3
+
+N_3 = 100;
+
+[e_3, c_L_3, c_Di_3] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3);
 
 %% Functions
 
@@ -377,8 +432,6 @@ ylabel('C_l')
 title('Effect of Camber on Lift')
 legend('NACA 0012', 'NACA 2412', 'NACA 4412','NACA 0012 TAT','NACA 2412 TAT', ...
     'NACA 4412 TAT','NACA 0012 Exp', 'NACA 2412 Exp', 'NACA 4412 Exp')
-
-%% Functions
 
 function [x_b,y_b,x_camber,y_camber] = NACA_Airfoils(m,p,t,c,N)
 % Reads in given airfoil atributes as well as a chosen number of panels and
@@ -616,13 +669,12 @@ end
 %% Part 2 Function
 
 function [e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N)
-
 % Function that completes the Prandtl Lifting Line Theorem. It feeds in the
 % span, lift slopes, chord length at root and tip, and aerodynamic and
 % geometric twists at the root and tip. It outputs the Span efficiency
 % factor, the coefficient of lift, and the coefficient of induced drag.
 %
-% Authors: Sam Wieder, Michael McAllister
+% Authors: Michael McAllister, Sam Wieder
 % Collaberators: Carson Schlageter, David Hernandez
 % Date: 4/14/2026
     % Convert all angles from degrees to radians

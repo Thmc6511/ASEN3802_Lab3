@@ -231,7 +231,7 @@ ALPHAS = linspace(-10,18,29);
 NACA0012Cl = [-1.1 -.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1.1 1.3 1.35 1.4 1.5 1.6 1.3 1];
 NACA2412Cl = [-.8 -.6 -.4 -.2 0 .2 .4 .6 .8 1 1.25 1.4 1.5 1.55 1.6 1.7 1.55 1.45];
 NACA4412Cl = [-.55 -.45 -.2 0 .2 .4 .6 .8 1 1.2 1.4 1.55 1.6 1.675 1.65 1.5 1.55 1.5];
-%angle of attack values corresponding to NACA chart Cl values
+% angle of attack values corresponding to NACA chart Cl values
 NACAchartalphas = [-10 -8 -6 -4 -2 0 2 4 6 8 10 12 13 14 15 16 17 18];
 
 %% Part 2
@@ -287,6 +287,55 @@ legend;
 grid on;
 xlim([0, 1]);
 ylim([0, 0.2]);
+
+%% Part 3
+
+Root_AF = '2412';
+Tip_AF = '0012';
+b_3 = 33.33; % ft
+c_r_3 = 5.33; % ft
+c_t_3 = 3.708; % ft
+geo_r_3 = 1;
+geo_t_3 = 0;
+aero_t_3 = 0;
+aero_r_3 = 0;
+
+%Functions for airfoils
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_r(i) = str2num(Root_AF(i));
+end
+
+% Defining the airfoil parameters
+m_r = digit_r(1) / 100;
+p_r = digit_r(2) / 10;
+t_r = (digit_r(3) * 10 + digit_r(4)) / 100;
+N_r = 50;
+
+% Airfoil function
+[x_br,y_br,~,~] = NACA_Airfoils(m_r,p_r,t_r,c_r_3,N_r);
+
+% Turning Matrix into an array of each digit
+for i = 1:4
+    digit_t(i) = str2num(Tip_AF(i));
+end
+
+% Defining the airfoil parameters
+m_t = digit_t(1) / 100;
+p_t = digit_t(2) / 10;
+t_t = (digit_t(3) * 10 + digit_t(4)) / 100;
+
+N_t = 50;
+
+% Airfoil function
+[x_bt,y_bt,x_camber_t,y_camber_t] = NACA_Airfoils(m_t,p_t,t_t,c_t_3,N_t);
+
+
+a0_t_3 = 2 * pi;
+a0_r_3 = 2 * pi;
+N_3 = 100;
+
+[e_3, c_L_3, c_Di_3] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3);
 
 %% Functions
 
@@ -383,8 +432,6 @@ ylabel('C_l')
 title('Effect of Camber on Lift')
 legend('NACA 0012', 'NACA 2412', 'NACA 4412','NACA 0012 TAT','NACA 2412 TAT', ...
     'NACA 4412 TAT','NACA 0012 Exp', 'NACA 2412 Exp', 'NACA 4412 Exp')
-
-%% Functions
 
 function [x_b,y_b,x_camber,y_camber] = NACA_Airfoils(m,p,t,c,N)
 % Reads in given airfoil atributes as well as a chosen number of panels and
@@ -622,13 +669,12 @@ end
 %% Part 2 Function
 
 function [e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N)
-
 % Function that completes the Prandtl Lifting Line Theorem. It feeds in the
 % span, lift slopes, chord length at root and tip, and aerodynamic and
 % geometric twists at the root and tip. It outputs the Span efficiency
 % factor, the coefficient of lift, and the coefficient of induced drag.
 %
-% Authors: Sam Wieder, Michael McAllister
+% Authors: Michael McAllister, Sam Wieder
 % Collaberators: Carson Schlageter, David Hernandez
 % Date: 4/14/2026
     % Convert all angles from degrees to radians
