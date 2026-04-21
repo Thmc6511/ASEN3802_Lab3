@@ -292,14 +292,14 @@ ylim([0, 0.2]);
 
 Root_AF = '2412';
 Tip_AF = '0012';
-b_3 = 33.33; % ft
-c_r_3 = 5.33; % ft
-c_t_3 = 3.708; % ft
-geo_r_3 = 1;
-geo_t_3 = 0;
-aero_t_3 = 0;
-aero_r_3 = 0;
+b_3 = 33 + (4/12); % ft
+c_r_3 = 5 + (4/12); % ft
+c_t_3 = 3 + (8.5/12); % ft
 AoA = 4;
+geo_r_3 = 1 + AoA;
+geo_t_3 = 0 + AoA;
+aero_t_3 = 0;
+AoA_guess = [-2,6];
 
 %Functions for airfoils
 % Turning Matrix into an array of each digit
@@ -315,7 +315,7 @@ N_r = 50;
 
 % Airfoil function
 [x_br,y_br,~,~] = NACA_Airfoils(m_r,p_r,t_r,c_r_3,N_r);
-[CL_r] = Vortex_Panel(x_br,y_br,AoA);
+CL_r = [Vortex_Panel(x_br,y_br,AoA_guess(1)),Vortex_Panel(x_br,y_br,AoA_guess(2))];
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -326,19 +326,57 @@ end
 m_t = digit_t(1) / 100;
 p_t = digit_t(2) / 10;
 t_t = (digit_t(3) * 10 + digit_t(4)) / 100;
-
 N_t = 50;
 
 % Airfoil function
 [x_bt,y_bt,x_camber_t,y_camber_t] = NACA_Airfoils(m_t,p_t,t_t,c_t_3,N_t);
-[CL_t] = Vortex_Panel(x_bt,y_bt,AoA);
+CL_t = [Vortex_Panel(x_bt,y_bt,AoA_guess(1)),Vortex_Panel(x_bt,y_bt,AoA_guess(2))];
+
+% Recalculating liftslopes to be safe and they are different than part 1 :/
+
+a0_t_3 = (CL_t(2)-CL_t(1)) / (AoA_guess(2) - AoA_guess(1));
+a0_r_3 = (CL_r(2)-CL_r(1)) / (AoA_guess(2) - AoA_guess(1));
+
+aero_r_3 = AoA_guess(1) - CL_r(1) / a0_r_3;
 
 % Experimental data pulled from the tables in task 4 part 1 by David
-a0_t_3 = 0.1054;
-a0_r_3 = 0.1011;
-N_3 = 50;
+a0_t_3 = a0_t_3 * 180/pi;
+a0_r_3 = a0_r_3 * 180/pi;
+N_3 = linspace(1,25,25);
 
-[e_3, c_L_3, c_Di_3] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3);
+for i = 1:length(N_3)
+    [e_3(i), c_L_3(i), c_Di_3(i)] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3(i));
+end
+
+c_d_r = 0.008;
+c_d_t = 0.006;
+
+cd_profile = (c_d_r * c_r_3 + c_d_t * c_t_3) / (c_r_3 + c_t_3);
+
+CD_3 = cd_profile + c_Di_3(end);
+
+% Calculate Lift and Drag
+
+V_knot = 100;
+V_cruise = 100 * 1.68781; % Ft/s
+alt = 10000;
+rho_10k = 0.001756;
+
+S = 0.5 * b_3 * (c_r_3 + c_t_3);
+q_inf = 0.5 * rho_10k * V_cruise^2;
+
+L = q_inf * S * c_L_3(end);
+D = q_inf * S * CD_3;
+
+figure()
+hold on;
+grid on;
+plot(N_3,c_L_3,'LineWidth',1.5,'Marker','.','MarkerSize',10)
+
+figure()
+hold on;
+grid on;
+plot(N_3,c_Di_3,'LineWidth',1.5,'Marker','.','MarkerSize',10)
 
 %% Functions
 
