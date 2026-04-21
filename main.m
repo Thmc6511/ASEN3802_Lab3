@@ -299,6 +299,7 @@ geo_r_3 = 1;
 geo_t_3 = 0;
 aero_t_3 = 0;
 aero_r_3 = 0;
+AoA = 4;
 
 %Functions for airfoils
 % Turning Matrix into an array of each digit
@@ -314,6 +315,7 @@ N_r = 50;
 
 % Airfoil function
 [x_br,y_br,~,~] = NACA_Airfoils(m_r,p_r,t_r,c_r_3,N_r);
+[CL_r] = Vortex_Panel(x_br,y_br,AoA);
 
 % Turning Matrix into an array of each digit
 for i = 1:4
@@ -329,7 +331,7 @@ N_t = 50;
 
 % Airfoil function
 [x_bt,y_bt,x_camber_t,y_camber_t] = NACA_Airfoils(m_t,p_t,t_t,c_t_3,N_t);
-
+[CL_t] = Vortex_Panel(x_bt,y_bt,AoA);
 
 a0_t_3 = 2 * pi;
 a0_r_3 = 2 * pi;
@@ -347,13 +349,9 @@ for i = 1:3
     expalphaL0(i) = interp1(EXP_NACAS{i}(1:11), NACAchartalphas(1:11), 0);
 end
 
-
-
 %vortex panel calculations
 % Turning Matrix into an array of each digit
-for i = 1:3
-    
-        
+for i = 1:3     
     digit2 = NACAS(i,:);
     
 
