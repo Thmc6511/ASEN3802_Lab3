@@ -333,9 +333,10 @@ N_t = 50;
 [x_bt,y_bt,x_camber_t,y_camber_t] = NACA_Airfoils(m_t,p_t,t_t,c_t_3,N_t);
 [CL_t] = Vortex_Panel(x_bt,y_bt,AoA);
 
-a0_t_3 = 2 * pi;
-a0_r_3 = 2 * pi;
-N_3 = 100;
+% Experimental data pulled from the tables in task 4 part 1 by David
+a0_t_3 = 0.1054;
+a0_r_3 = 0.1011;
+N_3 = 50;
 
 [e_3, c_L_3, c_Di_3] = PLLT(b_3, a0_t_3, a0_r_3, c_t_3, c_r_3, aero_t_3, aero_r_3, geo_t_3, geo_r_3, N_3);
 
@@ -725,7 +726,6 @@ function [e,c_L,c_Di] = PLLT(b,a0_t,a0_r,c_t,c_r,aero_t,aero_r,geo_t,geo_r,N)
     % Span efficiency and induced drag
     e = 1 / (1 + delta);
     c_Di = c_L^2 / (pi * AR * e);
-
 end
 
 
