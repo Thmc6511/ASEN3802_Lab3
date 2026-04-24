@@ -401,8 +401,8 @@ title('C_{Di} Convergence vs. Number of Odd PLLT Terms')
 % Deliverable 3
 % Calculate Lift and Drag
 % At 4 deg AoA for C_d, then calculating C_d
-c_d_r = 0.008;
-c_d_t = 0.006;
+c_d_r = 0.007;
+c_d_t = 0.007;
 cd_profile = (c_d_r * c_r_3 + c_d_t * c_t_3) / (c_r_3 + c_t_3);
 
 % Now finding CD total
