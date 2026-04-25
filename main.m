@@ -1,4 +1,4 @@
-%% ASEN 3802 - Lab 3: Part 1&2 - Main Code
+%% ASEN 3802 - Lab 3: Part 1,2 and 3 - Main Code
 % This MATLAB script that completes tasks 1-4 of Part 1 for Lab 3. Task 1
 % reads in airfoil traits and returns x and y values of an airfoils shape.
 % Task 2 find CL and compares error of this calculated value to an "exact
@@ -7,11 +7,14 @@
 % methods created in Task 1 and Task 2, then plots these results against
 % task 3. Added Part 2, Task 1, which uses PLLT to calculate induced
 % drag, it inputs various lift slope, chord lengths, and twists and
-% outputs of span efficiency, C_L, and C_D.
+% outputs of span efficiency, C_L, and C_D. Added Part 3, which uses the
+% PLLT and airfoil location functions to calculate C_L, C_D, and further on
+% L/D for an airfoil with a root of 2412, and a tip of 0012. We analyze the
+% L/D curve, and various C_D parts.
 %
 % Authors: Sam Wieder, Michael McAllister, Carson Schlageter, David
 % Hernandez
-% Date: 4/14/2026
+% Date: 4/24/2026
 
 clc;
 clear;
@@ -364,6 +367,7 @@ for i = 1:length(thresh)
     idxCL  = find(CL_err  <= thresh(i), 1, 'first');
     idxCDi = find(CDi_err <= thresh(i), 1, 'first');
 
+    % Loggin the index and its value into a new array.
     CL_thresh(i) = c_L_3(idxCL);
     N_CL_thresh(i) = N_3(idxCL);
     CDi_thresh(i) = c_Di_3(idxCDi);
